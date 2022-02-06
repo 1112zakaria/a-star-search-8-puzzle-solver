@@ -60,22 +60,26 @@ class GameState():
             8: (2,2)
     }
 
-    def __init__(self, state, curr_path_cost, direction=None, parent_state=None):
+    def __init__(self, state, direction=None, parent_state=None):
+        """
+        Initializes GameState object.
+
+        Potential speedup: defining location of 0-index
+        """
         self.state = state
-        self.path_cost = curr_path_cost
+        self.path_cost = 0
+        if parent_state:
+            # Assumption: if parent_state is defined, then so is direction
+            self.path_cost = parent_state.get_path_cost() + GameState.move_cost_map[direction]
         self.direction = direction
         self.parent_state = parent_state
-
-        if direction is not None:
-            self.path_cost += GameState.move_cost_map[direction]
         self.function_cost = self.path_cost + self.__get_manhattan_distance()
 
-        zero_index = 0
         # Find 0 index
         for i in range(len(self.state)):
             if self.state[i] == 0:
-                zero_index = i
-        self.zero_coord = self.__get_coordinate(zero_index)
+                self.zero_index = i
+        self.zero_coord = self.__get_coordinate(self.zero_index)
 
     @classmethod
     def init_globals(cls, goal_state, move_cost):
@@ -109,22 +113,33 @@ class GameState():
     
     def expand_tree(self):
         """
-        Returns list of expanded nodes
+        Returns list of expanded nodes.
+
+        Note: this chunk of code bothers me...
         """
         expanded_nodes = []
         if self.zero_coord[0] > 0:
             # Move left
-
-            pass
+            s_cpy = self.state.copy()
+            s_cpy[self.zero_index], s_cpy[self.zero_index-1] = \
+                s_cpy[self.zero_index-1], s_cpy[self.zero_index]
+            expanded_nodes += [GameState(s_cpy, 'l', self)]
         if self.zero_coord[0] < 2:
             # Move right
-            pass
+            s_cpy = self.state.copy()
+            s_cpy[self.zero_index], s_cpy[self.zero_index+1] = s_cpy[self.zero_index+1], s_cpy[self.zero_index]
+            expanded_nodes += [GameState(s_cpy, 'r', self)]
         if self.zero_coord[1] > 0:
             # Move up
-            pass
+            s_cpy = self.state.copy()
+            s_cpy[self.zero_index], s_cpy[self.zero_index-3] = s_cpy[self.zero_index-3], s_cpy[self.zero_index]
+            expanded_nodes += [GameState(s_cpy, 'u', self)]
         if self.zero_coord[1] < 2:
             # Move down
-            pass
+            s_cpy = self.state.copy()
+            s_cpy[self.zero_index], s_cpy[self.zero_index+3] = s_cpy[self.zero_index+3], s_cpy[self.zero_index]
+            expanded_nodes += [GameState(s_cpy, 'd', self)]
+        return expanded_nodes
 
     def get_key(self):
         return tuple(self.state)
@@ -182,9 +197,12 @@ def astar_search(init_state, goal_state, move_cost) -> str:
         >>> astar_search([8,0,7,1,4,3,2,5,6], [1,8,7,2,0,6,3,4,5], [1,1,2,2])
         'urddrulurdl'
     """
+    # Debug:
+    if init_state == [0,8,7,1,2,6,3,4,5]:
+        pdb.set_trace()
     GameState.init_globals(goal_state, move_cost)
     visited = {}
-    expanded_queue = [GameState(init_state, 0, direction=None, parent_state=None)]
+    expanded_queue = [GameState(init_state.copy(), direction=None, parent_state=None)]
 
     # For each root GameState in expanded_queue, expand and add new GameStates
     #   to expanded_queue
