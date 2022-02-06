@@ -14,7 +14,9 @@ Activate virtual environment using:
 Deactivate virtual environment using:
 `deactivate`
 
-To run tests, run:
+To run ALL tests, run:
+`./A1.py -v`
+To display only failing tests, run:
 `./A1.py`
 
 Note:

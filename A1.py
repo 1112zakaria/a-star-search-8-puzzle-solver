@@ -10,10 +10,9 @@
 ####################################################
 
 # Libraries
-from cmath import exp
 import doctest
-import pandas
 import heapq
+import pdb
 
 """
 Notes:
@@ -38,6 +37,13 @@ Approach for astar_search():
 class GameState():
     """
     Game state object.
+
+    Tests:
+        >>> GameState.init_globals([1,8,7,2,0,6,3,4,5], [1,1,1,1])
+
+        >>> a = GameState([1,8,7,2,0,6,3,4,5], 0)
+        >>> a._GameState__get_manhattan_distance()
+        0
     """
     move_cost_map = {}
     goal_state = None
@@ -54,15 +60,22 @@ class GameState():
             8: (2,2)
     }
 
-    def __init__(self, state, path_cost, direction=None, parent_state=None):
+    def __init__(self, state, curr_path_cost, direction=None, parent_state=None):
         self.state = state
-        self.path_cost = path_cost
+        self.path_cost = curr_path_cost
         self.direction = direction
         self.parent_state = parent_state
 
         if direction is not None:
             self.path_cost += GameState.move_cost_map[direction]
         self.function_cost = self.path_cost + self.__get_manhattan_distance()
+
+        zero_index = 0
+        # Find 0 index
+        for i in range(len(self.state)):
+            if self.state[i] == 0:
+                zero_index = i
+        self.zero_coord = self.__get_coordinate(zero_index)
 
     @classmethod
     def init_globals(cls, goal_state, move_cost):
@@ -74,7 +87,7 @@ class GameState():
         }
         cls.goal_state = goal_state
         cls.goal_coords = {}
-        for index in len(goal_state):
+        for index in range(len(goal_state)):
             val = goal_state[index]
             cls.goal_coords[val] = GameState.__get_coordinate(index)
 
@@ -86,13 +99,32 @@ class GameState():
         return GameState.index_map[index]
 
     def __get_manhattan_distance(self):
-        return 0
+        dist = 0
+        for index in self.state:
+            val = self.state[index]
+            curr_coord = self.__get_coordinate(index)
+            goal_coord = GameState.goal_coords[val]
+            dist += abs(curr_coord[0]-goal_coord[0]) + abs(curr_coord[1]-goal_coord[1])
+        return dist
     
     def expand_tree(self):
         """
-        Returns list of 
+        Returns list of expanded nodes
         """
-        pass
+        expanded_nodes = []
+        if self.zero_coord[0] > 0:
+            # Move left
+
+            pass
+        if self.zero_coord[0] < 2:
+            # Move right
+            pass
+        if self.zero_coord[1] > 0:
+            # Move up
+            pass
+        if self.zero_coord[1] < 2:
+            # Move down
+            pass
 
     def get_key(self):
         return tuple(self.state)
