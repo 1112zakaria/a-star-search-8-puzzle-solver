@@ -19,3 +19,4 @@ To run tests, run:
 
 Note:
     - installing pandas is kinda sus on this MacOS Monterey version... sadge
+        -> Updating pip solved this. POGGERS!
