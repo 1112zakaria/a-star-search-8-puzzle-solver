@@ -141,6 +141,17 @@ class GameState():
             expanded_nodes += [GameState(s_cpy, 'd', self)]
         return expanded_nodes
 
+    def get_optimal_path_string(self):
+        """
+        Gets optimal path string.
+        """
+        curr_state = self
+        path_string = ""
+        while curr_state.get_parent_state() is not None:
+            path_string = curr_state.get_direction() + path_string
+            curr_state = curr_state.get_parent_state()
+        return path_string
+
     def get_key(self):
         return tuple(self.state)
     
@@ -155,6 +166,9 @@ class GameState():
 
     def get_path_cost(self):
         return self.path_cost
+
+    def get_parent_state(self):
+        return self.parent_state
 
     def __eq__(self, other):
         if not isinstance(other, GameState):
@@ -198,8 +212,8 @@ def astar_search(init_state, goal_state, move_cost) -> str:
         'urddrulurdl'
     """
     # Debug:
-    if init_state == [0,8,7,1,2,6,3,4,5]:
-        pdb.set_trace()
+    # if init_state == [0,8,7,1,2,6,3,4,5]:
+    #     pdb.set_trace()
     GameState.init_globals(goal_state, move_cost)
     visited = {}
     expanded_queue = [GameState(init_state.copy(), direction=None, parent_state=None)]
@@ -217,7 +231,7 @@ def astar_search(init_state, goal_state, move_cost) -> str:
                 heapq.heappush(expanded_queue, state)
 
         root = expanded_queue[0]
-    return 0
+    return root.get_optimal_path_string()
 
 def id_astar_search(init_state, goal_state, move_cost) -> str:
     """
