@@ -9,7 +9,7 @@
 ####################################################
 
 Activate virtual environment using:
-`source bin/activate`
+`source env/bin/activate`
 
 Deactivate virtual environment using:
 `deactivate`
@@ -17,4 +17,5 @@ Deactivate virtual environment using:
 To run tests, run:
 `./A1.py`
 
-
+Note:
+    - installing pandas is kinda sus on this MacOS Monterey version... sadge
