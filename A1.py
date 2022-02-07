@@ -10,10 +10,13 @@
 ####################################################
 
 # Libraries
-from cmath import exp
 import doctest
 import heapq
 import pdb
+import logging
+import sys
+
+log = logging.getLogger(__name__)
 
 """
 Notes:
@@ -59,13 +62,13 @@ class GameState():
     goal_coords = None
     index_map = {
             0: (0,0),
-            1: (1,0),
-            2: (2,0),
-            3: (0,1),
+            1: (0,1),
+            2: (0,2),
+            3: (1,0),
             4: (1,1),
-            5: (2,1),
-            6: (0,2),
-            7: (1,2),
+            5: (1,2),
+            6: (2,0),
+            7: (2,1),
             8: (2,2)
     }
 
@@ -131,23 +134,23 @@ class GameState():
         if self.zero_coord[0] > 0:
             # Move left
             s_cpy = self.state.copy()
-            s_cpy[self.zero_index], s_cpy[self.zero_index-1] = \
-                s_cpy[self.zero_index-1], s_cpy[self.zero_index]
+            s_cpy[self.zero_index], s_cpy[self.zero_index-3] = \
+                s_cpy[self.zero_index-3], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'l', self)]
         if self.zero_coord[0] < 2:
             # Move right
             s_cpy = self.state.copy()
-            s_cpy[self.zero_index], s_cpy[self.zero_index+1] = s_cpy[self.zero_index+1], s_cpy[self.zero_index]
+            s_cpy[self.zero_index], s_cpy[self.zero_index+3] = s_cpy[self.zero_index+3], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'r', self)]
         if self.zero_coord[1] > 0:
             # Move up
             s_cpy = self.state.copy()
-            s_cpy[self.zero_index], s_cpy[self.zero_index-3] = s_cpy[self.zero_index-3], s_cpy[self.zero_index]
+            s_cpy[self.zero_index], s_cpy[self.zero_index-1] = s_cpy[self.zero_index-1], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'u', self)]
         if self.zero_coord[1] < 2:
             # Move down
             s_cpy = self.state.copy()
-            s_cpy[self.zero_index], s_cpy[self.zero_index+3] = s_cpy[self.zero_index+3], s_cpy[self.zero_index]
+            s_cpy[self.zero_index], s_cpy[self.zero_index+1] = s_cpy[self.zero_index+1], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'd', self)]
         return expanded_nodes
 
@@ -220,6 +223,7 @@ def astar_search(init_state, goal_state, move_cost) -> str:
         'urddrulurdl'
     """
     GameState.init_globals(goal_state, move_cost)
+    log.debug(f"move_map: {GameState.move_cost_map}")
     visited_map = {}
     expanded_map = {}
     expanded_queue = [GameState(init_state.copy(), direction=None, parent_state=None)]
@@ -248,12 +252,17 @@ def astar_search(init_state, goal_state, move_cost) -> str:
                 expanded_queue.sort()   # lazy solution compared to "trickling down" swapped node
                                         # heapq API didn't include this functionality for some reason...
                 heapq.heappush(expanded_queue, state)
-
-        print(f"root: {root}\nfrontier: {expanded_queue}\n")
+        if init_state == [1,6,0,2,7,8,3,4,5]:
+            #log.debug(f"root: {root}\nfrontier: {expanded_queue}\n")
+            pass
         root = expanded_queue[0]
 
+    log.debug(f"final root: {root}")
     path_string = ""
     curr_state = root
+    if init_state == [1,6,0,2,7,8,3,4,5]:
+        #pdb.set_trace()
+        pass
     while curr_state.get_parent_key() is not None:
         path_string = curr_state.get_direction() + path_string
         curr_state = visited_map[curr_state.get_parent_key()]
@@ -300,5 +309,6 @@ if __name__ == "__main__":
     ####################################################
     """
     print(header)
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, format='%(message)s')
     doctest.testmod()
     

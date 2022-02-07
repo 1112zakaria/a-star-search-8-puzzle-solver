@@ -22,3 +22,17 @@ To display only failing tests, run:
 Note:
     - installing pandas is kinda sus on this MacOS Monterey version... sadge
         -> Updating pip solved this. POGGERS!
+
+Observations:
+- test 1 results: 'dr'
+- test 2 results: 
+...
+- Test #4 is failing. Test #4 optimal string is 'ruldru'. Output is 'ruldru'.
+Nevermind, test #3 is failing. 
+-> OBSERVATION: it has the same expected path cost. Therefore, I need
+to setup a priority in the queue? WHY..... Report this to the professor
+please.
+
+TODO:
+    - ask professor about priority for which to pick (smallest direction?)
+    - modify __le__, __ge__, __lt__, __gt__ operators
