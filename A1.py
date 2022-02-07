@@ -10,6 +10,7 @@
 ####################################################
 
 # Libraries
+from cmath import exp
 import doctest
 import heapq
 import pdb
@@ -32,6 +33,14 @@ Approach for astar_search():
     - 5. f(n) = g(n) + h(n)
         - g(n) = path cost, h(n) = Manhattan distance
     - 6. Function ends when goal state is added to visited map
+
+    ERROR:
+        - you are only supposed to add child states if they
+            were not explored and not in expanded
+        - if child state is in expanded w/ higher cost than
+            new child state, then replace
+        -> YOU FUCKING IDIOT! YOU MESSED UP THE ORDER OF THE 
+            OF THE LIST.
 """
 
 class GameState():
@@ -68,11 +77,12 @@ class GameState():
         """
         self.state = state
         self.path_cost = 0
+        self.parent_key = None
         if parent_state:
             # Assumption: if parent_state is defined, then so is direction
             self.path_cost = parent_state.get_path_cost() + GameState.move_cost_map[direction]
+            self.parent_key = parent_state.get_key()
         self.direction = direction
-        self.parent_state = parent_state
         self.function_cost = self.path_cost + self.__get_manhattan_distance()
 
         # Find 0 index
@@ -141,18 +151,10 @@ class GameState():
             expanded_nodes += [GameState(s_cpy, 'd', self)]
         return expanded_nodes
 
-    def get_optimal_path_string(self):
-        """
-        Gets optimal path string.
-        """
-        curr_state = self
-        path_string = ""
-        while curr_state.get_parent_state() is not None:
-            path_string = curr_state.get_direction() + path_string
-            curr_state = curr_state.get_parent_state()
-        return path_string
-
     def get_key(self):
+        """
+        Potential improvement: use int instead of tuple
+        """
         return tuple(self.state)
     
     def get_direction(self):
@@ -167,8 +169,8 @@ class GameState():
     def get_path_cost(self):
         return self.path_cost
 
-    def get_parent_state(self):
-        return self.parent_state
+    def get_parent_key(self):
+        return self.parent_key
 
     def __eq__(self, other):
         if not isinstance(other, GameState):
@@ -184,6 +186,12 @@ class GameState():
         if not isinstance(other, GameState):
             raise NotImplementedError
         return self.function_cost < other.get_function_cost()
+
+    def __str__(self):
+        return f"{self.state}, path_cost: {self.path_cost}, f_n: {self.function_cost}, dir: {self.direction}\n"
+    
+    def __repr__(self):
+        return str(self)
 
 
 def astar_search(init_state, goal_state, move_cost) -> str:
@@ -211,27 +219,45 @@ def astar_search(init_state, goal_state, move_cost) -> str:
         >>> astar_search([8,0,7,1,4,3,2,5,6], [1,8,7,2,0,6,3,4,5], [1,1,2,2])
         'urddrulurdl'
     """
-    # Debug:
-    # if init_state == [0,8,7,1,2,6,3,4,5]:
-    #     pdb.set_trace()
     GameState.init_globals(goal_state, move_cost)
-    visited = {}
+    visited_map = {}
+    expanded_map = {}
     expanded_queue = [GameState(init_state.copy(), direction=None, parent_state=None)]
 
     # For each root GameState in expanded_queue, expand and add new GameStates
     #   to expanded_queue
     root = expanded_queue[0]
+    expanded_map[root.get_key()] = root
     while root.get_state() != goal_state:
         # Add root to visited and pop
-        visited[root.get_key()] = heapq.heappop(expanded_queue)
+        visited_map[root.get_key()] = heapq.heappop(expanded_queue)
+        del expanded_map[root.get_key()]
         
-        for state in root.expand_tree():
+        expanded_states = root.expand_tree()
+
+        for state in expanded_states:
             state_key = state.get_key()     # get tuple of state list
-            if state_key not in visited:
+            if state_key not in visited_map and state_key not in expanded_map:
+                # Add new state to expanded queue (frontier)
+                heapq.heappush(expanded_queue, state)
+                expanded_map[state_key] = state
+            elif state_key in expanded_map and expanded_map[state_key].get_function_cost() > state.get_function_cost():
+                # Replace existing state in frontier w/ improved version
+                expanded_queue.remove(expanded_map[state_key])
+                expanded_map[state_key] = state
+                expanded_queue.sort()   # lazy solution compared to "trickling down" swapped node
+                                        # heapq API didn't include this functionality for some reason...
                 heapq.heappush(expanded_queue, state)
 
+        print(f"root: {root}\nfrontier: {expanded_queue}\n")
         root = expanded_queue[0]
-    return root.get_optimal_path_string()
+
+    path_string = ""
+    curr_state = root
+    while curr_state.get_parent_key() is not None:
+        path_string = curr_state.get_direction() + path_string
+        curr_state = visited_map[curr_state.get_parent_key()]
+    return path_string
 
 def id_astar_search(init_state, goal_state, move_cost) -> str:
     """
