@@ -46,6 +46,18 @@ Approach for astar_search():
             OF THE LIST.
 """
 
+"""
+Approach for IDA*:
+    - for each smallest f-cost exceeding the current cutoff cost value
+        until the goal is found:
+        - 1. Expand the nodes of the current root
+        - 2. If an expanded node exceeds the cutoff, do not add it to the
+            frontier queue
+            - record the smallest expanded node cost
+        - 3. Repeat until the frontier is empty and return the smallest
+            exceeding cutoff
+"""
+
 class GameState():
     """
     Game state object.
