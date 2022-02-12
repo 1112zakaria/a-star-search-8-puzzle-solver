@@ -56,6 +56,25 @@ Approach for IDA*:
             - record the smallest expanded node cost
         - 3. Repeat until the frontier is empty and return the smallest
             exceeding cutoff
+
+Revised approach:
+    - until a solution is reached, keep calling search method (returns next_offset, goal_obj):
+        curr_offset = max_offset
+        goal_obj = None
+        1. Check if current state is goal state
+            a. Return None, goal_state if True
+        2. If function cost of state is greater than curr_offset,
+            curr_offset = state.fn
+        3. Expand tree, for each new_state,
+            a. If max_offset < new_state.fn < curr_offset,
+                curr_offset = new_state.fn
+            b. If new_state.fn <= max_offset,
+                o,g = search()
+                i. If max_offset < o < curr_offset
+                    curr_offset = o
+                ii. If g is not None and goal_obj is not None and g.fn < goal_obj.fn or g is not None
+                        goal_obj = g
+        4. Return curr_offset, goal_obj
 """
 
 class GameState():
@@ -306,6 +325,14 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
         >>> id_astar_search([8,0,7,1,4,3,2,5,6], [1,8,7,2,0,6,3,4,5], [1,1,2,2])
         'urddrulurdl'
     """
+    return 0
+
+def search(state, goal_state, max_offset):
+    """
+    Searches for goal_state recursively and smallest
+    function cost that exceeds max_offset
+    """
+
     return 0
 
 if __name__ == "__main__":
