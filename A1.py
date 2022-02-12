@@ -76,6 +76,11 @@ Revised approach:
                 ii. If g is not None and goal_obj is not None and g.fn < goal_obj.fn or g is not None
                         goal_obj = g
         4. Return curr_offset, goal_obj
+
+    ERRORS:
+        - Program never gets past searching the first node
+            SOLUTION: fix offset incrementing section
+        
 """
 
 class GameState():
@@ -326,6 +331,8 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
         >>> id_astar_search([8,0,7,1,4,3,2,5,6], [1,8,7,2,0,6,3,4,5], [1,1,2,2])
         'urddrulurdl'
     """
+    # if init_state == [1,8,7,3,0,2,4,5,6]:
+    #     pdb.set_trace()
     GameState.init_globals(goal_state, move_cost)
     init_obj = GameState(init_state, direction=None, parent_state=None)
     offset = 0
@@ -333,15 +340,37 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
     while goal_obj is None:
         offset, goal_obj = search(init_obj, goal_state, offset)
     log.debug(goal_obj)
+
     return 0
 
-def search(state, goal_state, max_offset):
+def search(state_obj, goal_state, max_offset):
     """
     Searches for goal_state recursively and smallest
     function cost that exceeds max_offset
     """
+    curr_offset = None
+    goal_obj = None
+    
+    if state_obj.get_state() == goal_state:
+        return max_offset, state_obj
+    
+    if state_obj.get_function_cost() > max_offset:
+        curr_offset = state_obj.get_function_cost()
+    
+    for new_state in state_obj.expand_tree():
+        fn = new_state.get_function_cost()
+        if fn <= max_offset:
+            o,g = search(new_state, goal_state, max_offset)
+            if g is not None and goal_obj is not None and g.get_function_cost() < goal_obj.get_function_cost() \
+                or g is not None:
+                goal_obj = g
+            if curr_offset is None or max_offset < o < curr_offset:
+                curr_offset = o
+        
+        if curr_offset is None or max_offset < fn < curr_offset:
+            curr_offset = fn
 
-    return 0
+    return curr_offset, goal_obj
 
 if __name__ == "__main__":
     header = """
