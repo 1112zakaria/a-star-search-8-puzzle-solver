@@ -3,18 +3,14 @@
 # COMP3106 - Introduction to Artificial Intelligence
 # Assignment 1
 
-# February 2022, Zakaria Ismail
-
-# Copyright (c) 2022 by Cisco Systems, Inc. 
-# All rights reserved.
+# February 2022, Zakaria Ismail - 101143497
 ####################################################
 
-# Libraries
+# Python Libraries
 import doctest
 import heapq
 import pdb
 import logging
-from shutil import move
 import sys
 
 log = logging.getLogger(__name__)
@@ -265,7 +261,6 @@ def astar_search(init_state, goal_state, move_cost) -> str:
         'urddrulurdl'
     """
     GameState.init_globals(goal_state, move_cost)
-    log.debug(f"move_map: {GameState.move_cost_map}")
     visited_map = {}
     expanded_map = {}
     expanded_queue = [GameState(init_state.copy(), direction=None, parent_state=None)]
@@ -292,19 +287,15 @@ def astar_search(init_state, goal_state, move_cost) -> str:
                 expanded_queue.remove(expanded_map[state_key])
                 expanded_map[state_key] = state
                 expanded_queue.sort()   # lazy solution compared to "trickling down" swapped node
-                                        # heapq API didn't include this functionality for some reason...
+                                        # heapq API didn't include this functionality for some reason
+                                        # and suggested that .sort() be used... pretend 
                 heapq.heappush(expanded_queue, state)
-        if init_state == [1,6,0,2,7,8,3,4,5]:
-            #log.debug(f"root: {root}\nfrontier: {expanded_queue}\n")
-            pass
+
         root = expanded_queue[0]
 
-    log.debug(f"final root: {root}")
     path_string = ""
     curr_state = root
-    if init_state == [1,6,0,2,7,8,3,4,5]:
-        #pdb.set_trace()
-        pass
+
     while curr_state.get_parent_key() is not None:
         path_string = curr_state.get_direction() + path_string
         curr_state = visited_map[curr_state.get_parent_key()]
@@ -336,15 +327,12 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
         >>> id_astar_search([8,0,7,1,4,3,2,5,6], [1,8,7,2,0,6,3,4,5], [1,1,2,2])
         'urddrulurdl'
     """
-    # if init_state == [1,8,7,3,0,2,4,5,6]:
-    #     pdb.set_trace()
     GameState.init_globals(goal_state, move_cost)
     init_obj = GameState(init_state, direction=None, parent_state=None)
     offset = 0
     goal_obj = None
     while goal_obj is None:
         offset, goal_obj = search(init_obj, goal_state, offset)
-    log.debug(goal_obj)
 
     curr_state = goal_obj
     optimal_string = ""
@@ -389,13 +377,11 @@ if __name__ == "__main__":
     # COMP3106 - Introduction to Artificial Intelligence
     # Assignment 1
 
-    # February 2022, Zakaria Ismail
-
-    # Copyright (c) 2022 by Cisco Systems, Inc. 
-    # All rights reserved.
+    # February 2022, Zakaria Ismail - 101143497
     ####################################################
     """
     print(header)
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, format='%(message)s')
-    doctest.testmod()
+    # UNCOMMENT THE LINE BELOW FOR AUTOMATED DOCTESTS
+    #doctest.testmod()
     
