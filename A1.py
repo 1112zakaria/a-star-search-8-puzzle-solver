@@ -379,6 +379,8 @@ if __name__ == "__main__":
 
     # February 2022, Zakaria Ismail - 101143497
     ####################################################
+
+    Uncomment doctest.testmod() to run the automated doctests.
     """
     print(header)
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout, format='%(message)s')
