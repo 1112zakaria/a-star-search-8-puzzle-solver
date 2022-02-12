@@ -332,7 +332,7 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
     offset = 0
     goal_obj = None
     while goal_obj is None:
-        offset, goal_obj = search(init_obj, goal_state, offset)
+        offset, goal_obj = _search(init_obj, goal_state, offset)
 
     curr_state = goal_obj
     optimal_string = ""
@@ -342,7 +342,7 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
 
     return optimal_string
 
-def search(state_obj, goal_state, max_offset):
+def _search(state_obj, goal_state, max_offset):
     """
     Searches for goal_state recursively and smallest
     function cost that exceeds max_offset
@@ -359,7 +359,7 @@ def search(state_obj, goal_state, max_offset):
     for new_state in state_obj.expand_tree():
         fn = new_state.get_function_cost()
         if fn <= max_offset:
-            o,g = search(new_state, goal_state, max_offset)
+            o,g = _search(new_state, goal_state, max_offset)
             if g is not None and goal_obj is not None and g.get_function_cost() < goal_obj.get_function_cost() \
                 or g is not None:
                 goal_obj = g
