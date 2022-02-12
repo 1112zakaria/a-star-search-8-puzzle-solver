@@ -166,23 +166,23 @@ class GameState():
         Note: this chunk of code bothers me...
         """
         expanded_nodes = []
-        if self.zero_coord[0] > 0:
+        if self.zero_coord[0] > 0 and self.direction != 'r':
             # Move left
             s_cpy = self.state.copy()
             s_cpy[self.zero_index], s_cpy[self.zero_index-3] = \
                 s_cpy[self.zero_index-3], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'l', self)]
-        if self.zero_coord[0] < 2:
+        if self.zero_coord[0] < 2 and self.direction != 'l':
             # Move right
             s_cpy = self.state.copy()
             s_cpy[self.zero_index], s_cpy[self.zero_index+3] = s_cpy[self.zero_index+3], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'r', self)]
-        if self.zero_coord[1] > 0:
+        if self.zero_coord[1] > 0 and self.direction != 'd':
             # Move up
             s_cpy = self.state.copy()
             s_cpy[self.zero_index], s_cpy[self.zero_index-1] = s_cpy[self.zero_index-1], s_cpy[self.zero_index]
             expanded_nodes += [GameState(s_cpy, 'u', self)]
-        if self.zero_coord[1] < 2:
+        if self.zero_coord[1] < 2 and self.direction != 'u':
             # Move down
             s_cpy = self.state.copy()
             s_cpy[self.zero_index], s_cpy[self.zero_index+1] = s_cpy[self.zero_index+1], s_cpy[self.zero_index]
