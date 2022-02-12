@@ -118,8 +118,10 @@ class GameState():
         self.state = state
         self.path_cost = 0
         self.parent_key = None
+        self.parent_state = None
         if parent_state:
             # Assumption: if parent_state is defined, then so is direction
+            self.parent_state = parent_state
             self.path_cost = parent_state.get_path_cost() + GameState.move_cost_map[direction]
             self.parent_key = parent_state.get_key()
         self.direction = direction
@@ -211,6 +213,9 @@ class GameState():
 
     def get_parent_key(self):
         return self.parent_key
+
+    def get_parent_state(self):
+        return self.parent_state
 
     def __eq__(self, other):
         if not isinstance(other, GameState):
@@ -341,7 +346,13 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
         offset, goal_obj = search(init_obj, goal_state, offset)
     log.debug(goal_obj)
 
-    return 0
+    curr_state = goal_obj
+    optimal_string = ""
+    while curr_state.get_direction() is not None:
+        optimal_string = curr_state.get_direction() + optimal_string
+        curr_state = curr_state.get_parent_state()
+
+    return optimal_string
 
 def search(state_obj, goal_state, max_offset):
     """
