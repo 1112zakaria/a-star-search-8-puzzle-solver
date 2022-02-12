@@ -14,6 +14,7 @@ import doctest
 import heapq
 import pdb
 import logging
+from shutil import move
 import sys
 
 log = logging.getLogger(__name__)
@@ -325,6 +326,13 @@ def id_astar_search(init_state, goal_state, move_cost) -> str:
         >>> id_astar_search([8,0,7,1,4,3,2,5,6], [1,8,7,2,0,6,3,4,5], [1,1,2,2])
         'urddrulurdl'
     """
+    GameState.init_globals(goal_state, move_cost)
+    init_obj = GameState(init_state, direction=None, parent_state=None)
+    offset = 0
+    goal_obj = None
+    while goal_obj is None:
+        offset, goal_obj = search(init_obj, goal_state, offset)
+    log.debug(goal_obj)
     return 0
 
 def search(state, goal_state, max_offset):
