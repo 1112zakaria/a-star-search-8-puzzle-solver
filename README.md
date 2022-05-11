@@ -4,7 +4,7 @@
 
 # February 2022, Zakaria Ismail
 
-# Copyright (c) 2022 by Cisco Systems, Inc. 
+# Copyright (c) 2022 by Zakaria Ismail
 # All rights reserved.
 ####################################################
 
